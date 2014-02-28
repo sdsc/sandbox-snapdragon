@@ -1,0 +1,10 @@
+[root@reptile ~]# yum install openmpi openmpi-devel
+[root@reptile ~]# cd /root/packages/
+[root@reptile packages]# wget http://www.netlib.org/benchmark/hpl/hpl-2.1.tar.gz
+[root@reptile packages]# tar -zxf hpl-2.1.tar.gz 
+[root@reptile packages]# cd hpl-2.1/
+[root@reptile hpl-2.1]# cp ~/Make.snapdragon ./
+[root@reptile hpl-2.1]# module load mpi
+[root@reptile hpl-2.1]# make arch=snapdragon
+[root@reptile hpl-2.1]# cd bin/snapdragon
+[root@reptile snapdragon]# mpirun -np 4 ./xhpl 

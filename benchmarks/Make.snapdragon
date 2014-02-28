@@ -1,0 +1,73 @@
+# ----------------------------------------------------------------------
+# - Platform identifier ------------------------------------------------
+# ----------------------------------------------------------------------
+#
+ARCH         = snapdragon
+
+# ----------------------------------------------------------------------
+# - shell --------------------------------------------------------------
+# ----------------------------------------------------------------------
+#
+SHELL        = /bin/sh
+#
+CD           = cd
+CP           = cp
+LN_S         = ln -s
+MKDIR        = mkdir
+RM           = /bin/rm -f
+TOUCH        = touch
+
+
+TOPdir       = /root/packages/hpl-2.1
+INCdir       = $(TOPdir)/include
+BINdir       = $(TOPdir)/bin/$(ARCH)
+LIBdir       = $(TOPdir)/lib/$(ARCH)
+
+HPLlib       = $(LIBdir)/libhpl.a 
+
+# ----------------------------------------------------------------------
+# - Message Passing library (MPI) --------------------------------------
+# ----------------------------------------------------------------------
+# MPinc tells the  C  compiler where to find the Message Passing library
+# header files,  MPlib  is defined  to be the name of  the library to be
+# used. The variable MPdir is only used for defining MPinc and MPlib.
+#
+#MPdir        = /usr/lib64/mpich2
+#MPinc        = -I$(MPdir)/include
+#MPlib        = $(MPdir)/lib/libmpich.a
+
+
+# ----------------------------------------------------------------------
+# - Linear Algebra library (BLAS or VSIPL) -----------------------------
+# ----------------------------------------------------------------------
+# LAinc tells the  C  compiler where to find the Linear Algebra  library
+# header files,  LAlib  is defined  to be the name of  the library to be
+# used. The variable LAdir is only used for defining LAinc and LAlib.
+#
+LAdir        = /usr/local/atlas
+LAinc        = -I$(LAdir)/include
+LAlib        = $(LAdir)/lib/libcblas.a $(LAdir)/lib/libatlas.a
+
+HPL_OPTS     = -DHPL_CALL_CBLAS
+
+HPL_INCLUDES = -I$(INCdir) -I$(INCdir)/$(ARCH) $(LAinc)
+HPL_LIBS     = $(HPLlib) $(LAlib)
+HPL_DEFS     = $(HPL_OPTS) $(HPL_INCLUDES)
+
+# ----------------------------------------------------------------------
+# - Compilers / linkers - Optimization flags ---------------------------
+# ----------------------------------------------------------------------
+#
+CC           = mpicc
+CCNOOPT      = $(HPL_DEFS)
+CCFLAGS      = $(HPL_DEFS) -fomit-frame-pointer -O3 -funroll-loops -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard 
+#
+# On some platforms,  it is necessary  to use the Fortran linker to find
+# the Fortran internals used in the BLAS library.
+#
+LINKER       = mpicc
+LINKFLAGS    = $(CCFLAGS)
+
+ARCHIVER     = ar
+ARFLAGS      = r
+RANLIB       = echo
