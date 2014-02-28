@@ -1,0 +1,53 @@
+read errata for 3.10 and ARM
+
+[root@reptile packages]# pwd
+/root/packages
+[root@reptile packages]# wget http://math-atlas.sourceforge.net/fixes/armhardfp_archdef.tar
+[root@reptile packages]# tar -xf armhardfp_archdef.tar
+[root@reptile packages]# wget http://www.netlib.org/lapack/lapack-3.4.1.tgz
+[root@reptile packages]# ls
+ARMHARDFP  ATLAS  armhardfp_archdef.tar  atlas-build  atlas3.10.1.tar.bz2  atlcomp.txt  iperf-3.0.1  iperf-3.0.1.tar.gz  lapack-3.4.1.tgz
+
+
+[root@reptile atlas-build]# for i in 0 1 2 3; do    echo performance > /sys/devices/system/cpu/cpu$i/cpufreq/scaling_governor; done
+[root@reptile atlas-build]# /root/packages/ATLAS/configure   --with-netlib-lapack-tarfile=/root/packages/lapack-3.4.1.tgz  -D c -DATL_ARM_HARDFP=1 -Ss ADdir /root/packages/ARMHARDFP
+[root@reptile atlas-build]# make build
+[root@reptile atlas-build]# make check
+[root@reptile atlas-build]# make ptcheck
+[root@reptile atlas-build]# make time
+
+Enter Clock rate in Mhz [0]: 1674   
+
+The times labeled Reference are for ATLAS as installed by the authors.
+NAMING ABBREVIATIONS:
+   kSelMM : selected matmul kernel (may be hand-tuned)
+   kGenMM : generated matmul kernel
+   kMM_NT : worst no-copy kernel
+   kMM_TN : best no-copy kernel
+   BIG_MM : large GEMM timing (usually N=1600); estimate of asymptotic peak
+   kMV_N  : NoTranspose matvec kernel
+   kMV_T  : Transpose matvec kernel
+   kGER   : GER (rank-1 update) kernel
+Kernel routines are not called by the user directly, and their
+performance is often somewhat different than the total
+algorithm (eg, dGER perf may differ from dkGER)
+
+
+Reference clock rate=1674Mhz, new rate=1674Mhz
+   Refrenc : % of clock rate achieved by reference install
+   Present : % of clock rate achieved by present ATLAS install
+
+                    single precision                  double precision
+            ********************************   *******************************
+                  real           complex           real           complex
+            ---------------  ---------------  ---------------  ---------------
+Benchmark   Refrenc Present  Refrenc Present  Refrenc Present  Refrenc Present
+=========   ======= =======  ======= =======  ======= =======  ======= =======
+  kSelMM       79.6    83.6     77.9   142.9     41.3   125.5     45.6    88.1
+  kGenMM       68.0    70.8     66.5   128.1     32.9    48.0     34.3    88.1
+  kMM_NT       66.5    55.5     63.0   114.4     37.8    53.3     29.6    67.9
+  kMM_TN       67.5   126.1     58.6    47.1     30.6    47.5     32.3    37.9
+  BIG_MM       82.1   141.8     81.5    87.3     44.9    56.2     44.0    56.2
+   kMV_N        7.6    14.3     24.3    36.7      4.4     6.9      9.8    27.3
+   kMV_T       14.8    11.9     28.1    20.0      7.2    13.7     10.7    13.8
+    kGER        9.7    23.9     22.6    31.4      4.7    13.7      8.3    22.0
